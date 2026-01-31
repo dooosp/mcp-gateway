@@ -67,6 +67,12 @@ config({ path: join(homedir(), '.secrets', '.env') });
 
 - **pr-review-agent 결과:** 보안6룰+성능6룰 전체 통과 (0건)
 
+- **완료된 후속 작업:**
+  - GitHub private repo 생성 (dooosp/mcp-gateway)
+  - pr-review-agent로 전체 코드 스캔 완료 (보안6+성능6 = 0건)
+  - self-healing-agent config.js에 mcp-gateway 등록 (priority: high)
+  - pre-commit hook 설치 완료
+
 - **Next Step:**
   - invest-quant Render 배포 시 GitHub Actions 연동 검토
   - 2순위 에이전트 추가 (topdown-learner, pm-agent-system)
