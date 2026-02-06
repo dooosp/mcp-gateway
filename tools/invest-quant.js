@@ -1,22 +1,9 @@
 import { z } from 'zod';
-import { createRequire } from 'module';
-
-const require = createRequire(import.meta.url);
-const IQ_PATH = process.env.INVEST_QUANT_PATH
-  || '/home/taeho/invest-quant';
+import * as api from '../lib/invest-intel-client.js';
 
 const STOCK_CODE = z.string().regex(/^\d{6}$/).describe('6자리 종목코드');
 
 export function register(server) {
-  let scorer, advisory;
-  try {
-    scorer = require(`${IQ_PATH}/modules/fundamental/fundamental-scorer`);
-    advisory = require(`${IQ_PATH}/modules/integration/advisory-engine`);
-  } catch (e) {
-    console.error(`[mcp-gateway] invest-quant 로드 실패: ${e.message}`);
-    return;
-  }
-
   const txt = (obj) => ({ content: [{ type: 'text', text: JSON.stringify(obj) }] });
   const err = (msg) => ({ content: [{ type: 'text', text: msg }], isError: true });
 
@@ -26,10 +13,16 @@ export function register(server) {
     inputSchema: { stockCode: STOCK_CODE }
   }, async ({ stockCode }) => {
     try {
-      const d = await scorer.scoreFundamental(stockCode);
+      const d = await api.getFundamental(stockCode);
       if (!d.available) return err('펀더멘털 데이터 없음');
       const b = d.breakdown || {};
-      return txt({ score: d.score, valuation: b.valuation, profitability: b.profitability, stability: b.stability, growth: b.growth });
+      return txt({
+        score: d.score,
+        valuation: b.valuation,
+        profitability: b.profitability,
+        stability: b.stability,
+        growth: b.growth,
+      });
     } catch (e) { return err(e.message); }
   });
 
@@ -43,8 +36,13 @@ export function register(server) {
     }
   }, async ({ stockCode, currentPrice, technicalScore }) => {
     try {
-      const d = await advisory.adviseBuy({ stockCode, currentPrice, technicalScore });
-      return txt({ approved: d.approved, confidence: d.confidence, positionSize: d.positionSize, reasons: d.reasons });
+      const d = await api.adviseBuy({ stockCode, currentPrice, technicalScore });
+      return txt({
+        approved: d.approved,
+        confidence: d.confidence,
+        positionSize: d.positionSize,
+        reasons: d.reasons,
+      });
     } catch (e) { return err(e.message); }
   });
 
@@ -58,8 +56,12 @@ export function register(server) {
     }
   }, async ({ stockCode, currentPrice, profitRate }) => {
     try {
-      const d = await advisory.adviseSell({ stockCode, currentPrice, profitRate });
-      return txt({ approved: d.approved, reason: d.reason, reasons: d.reasons });
+      const d = await api.adviseSell({ stockCode, currentPrice, profitRate });
+      return txt({
+        approved: d.approved,
+        reason: d.reason,
+        reasons: d.reasons,
+      });
     } catch (e) { return err(e.message); }
   });
 }
