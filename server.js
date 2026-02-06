@@ -15,6 +15,7 @@ import { register as registerEcho } from './tools/anti-echo-chamber.js';
 import { register as registerReport } from './tools/report-builder.js';
 import { register as registerNotion } from './tools/notion-portfolio.js';
 import { register as registerRobot } from './tools/robot-modeler.js';
+import { register as registerDiagnostics } from './tools/diagnostics.js';
 
 const server = new McpServer({
   name: 'mcp-gateway',
@@ -27,6 +28,7 @@ registerEcho(server);
 registerReport(server);
 registerNotion(server);
 registerRobot(server);
+registerDiagnostics(server);
 
 const transport = new StdioServerTransport();
 await server.connect(transport);
