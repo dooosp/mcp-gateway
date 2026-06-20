@@ -16,6 +16,8 @@ import { register as registerReport } from './tools/report-builder.js';
 import { register as registerNotion } from './tools/notion-portfolio.js';
 import { register as registerRobot } from './tools/robot-modeler.js';
 import { register as registerDiagnostics } from './tools/diagnostics.js';
+import { register as registerFreecad } from './tools/freecad-automation.js';
+import { register as registerGrahamGate } from './tools/graham-gate.js';
 
 const server = new McpServer({
   name: 'mcp-gateway',
@@ -29,6 +31,8 @@ registerReport(server);
 registerNotion(server);
 registerRobot(server);
 registerDiagnostics(server);
+registerFreecad(server);
+registerGrahamGate(server);
 
 const transport = new StdioServerTransport();
 await server.connect(transport);
